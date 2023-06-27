@@ -2,6 +2,7 @@ import './App.css';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
 import { useState } from 'react';
+import {miniMaxRoot} from './minimax.js' 
 
 function App() {
   const [game, setGame] = useState(new Chess());
@@ -13,6 +14,7 @@ function App() {
     ['q', 9],
     ['k', 12]//this might change we'll see
   ])
+
 
   function makeMove(move){
     //check if it is a valid move
@@ -38,7 +40,7 @@ function App() {
     if(move === false){
       return false;
     } else{//if move was valid
-      setTimeout(betterMove, 1000)
+      setTimeout(makeMiniMaxMove, 1000)
       return true
     }
   }
@@ -51,6 +53,12 @@ function App() {
     makeMove(possibleMoves[randomIndex]);
   }
 
+  function makeMiniMaxMove(){
+    const bestMove = miniMaxRoot(3, game.fen(), true)
+    makeMove(bestMove)
+    
+  }
+  
   function betterMove(){//looks 1 move ahead with minmax
     const possibleMoves = game.moves();
     const gameCopy = new Chess(game.fen())
@@ -101,8 +109,7 @@ function App() {
         <div id='controls' className='flex flex-col'>
           <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => setGame(new Chess())}>RESTART</button>
           <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => getNumericalValues(game)}>LOG</button>
-          <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => makeMove('e4')}>MOVE white</button>
-          <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => makeMove('Nc6')}>MOVE black</button>
+          <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => miniMaxRoot(3, game.fen(), false)}>MOVE white</button>
         </div>
         <div className='w-1/2'>
           <Chessboard position={game.fen()} onPieceDrop={onDrop} />
