@@ -8,7 +8,7 @@ export function miniMaxRoot(depth, gamestring, isAIPlayer){//AI player is black
   for(let i = 0; i < moves.length; i++){
     let move = moves[i]
     gameCopy.move(move)
-    var value = minimax(depth - 1, gameCopy, !isAIPlayer)
+    var value = minimaxAlphaBetaPruning(depth - 1, gameCopy, !isAIPlayer)
     gameCopy.undo();
     if(value >= bestEval){
       bestEval = value;
@@ -47,6 +47,43 @@ function minimax(depth, game, isAIPlayer){
 
 }
 
+function minimaxAlphaBetaPruning(depth, game, alpha, beta, isAIPlayer){
+  if(depth === 0){
+    return -getNumericalValues(game);
+  }
+  var moves = game.moves({verbose: true});
+  if(isAIPlayer){
+    let bestEval = 9999;
+    for(let i = 0; i < moves.length; i++){
+      game.move(moves[i]);
+      bestEval = Math.min(bestEval, minimaxAlphaBetaPruning(depth - 1, game, alpha, beta, !isAIPlayer))
+      game.undo()
+
+      //alpha-beta pruning
+      beta = Math.min(beta, bestEval);
+      if(beta <= alpha){
+        return bestEval
+      }
+    }
+    return bestEval;
+  }
+  else {
+    let bestEval = -9999;
+    for(let i = 0; i < moves.length; i++){
+      game.move(moves[i]);
+      bestEval = Math.max(bestEval, minimaxAlphaBetaPruning(depth - 1, game, !isAIPlayer))
+      game.undo()
+
+      //alpha beta pruning
+      alpha = Math.max(alpha, bestEval)
+      if(alpha >= beta)
+        return bestEval;
+    }
+    return bestEval;
+  }
+
+}
+
 const pieceValues = new Map([
   ['p', 1],
   ['n', 3],
@@ -69,6 +106,5 @@ function getNumericalValues(game){
         value -= pieceValues.get(board[i][j]?.type)
     }
   }
-  // console.log(value);
   return value;
 }
