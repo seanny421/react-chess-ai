@@ -8,7 +8,7 @@ export function miniMaxRoot(depth, gamestring, isAIPlayer){//AI player is black
   for(let i = 0; i < moves.length; i++){
     let move = moves[i]
     gameCopy.move(move)
-    var value = minimaxAlphaBetaPruning(depth - 1, gameCopy, !isAIPlayer)
+    var value = minimaxAlphaBetaPruning(depth - 1, gameCopy, -10000, 10000, !isAIPlayer)
     gameCopy.undo();
     if(value >= bestEval){
       bestEval = value;
@@ -62,6 +62,7 @@ function minimaxAlphaBetaPruning(depth, game, alpha, beta, isAIPlayer){
       //alpha-beta pruning
       beta = Math.min(beta, bestEval);
       if(beta <= alpha){
+        console.log('beta pruning!')
         return bestEval
       }
     }
@@ -71,13 +72,16 @@ function minimaxAlphaBetaPruning(depth, game, alpha, beta, isAIPlayer){
     let bestEval = -9999;
     for(let i = 0; i < moves.length; i++){
       game.move(moves[i]);
-      bestEval = Math.max(bestEval, minimaxAlphaBetaPruning(depth - 1, game, !isAIPlayer))
+      bestEval = Math.max(bestEval, minimaxAlphaBetaPruning(depth - 1, game, alpha, beta, !isAIPlayer))
       game.undo()
 
       //alpha beta pruning
       alpha = Math.max(alpha, bestEval)
-      if(alpha >= beta)
+      if(alpha >= beta){
+        console.log('alpha pruning!')
         return bestEval;
+
+      }
     }
     return bestEval;
   }
