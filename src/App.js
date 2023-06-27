@@ -1,7 +1,14 @@
 import './App.css';
 import { Chessboard } from 'react-chessboard';
 import { Chess } from 'chess.js';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import WorkerBuilder from './worker-builder';
+import checkmovesWorker from './checkmoves-worker'; 
+
+
+let checkmovesInstance;
+//TODO - have a look at craco and use worker-loader for importing modules in worker
+//     - have  a look at passing the .board() array and working with that
 
 function App() {
   const [game, setGame] = useState(new Chess());
@@ -13,6 +20,28 @@ function App() {
     ['q', 9],
     ['k', 12]//this might change we'll see
   ])
+
+  const [counter, setCounter] = useState(0)
+
+  function startWorker(){
+    console.log(checkmovesInstance)
+    if(checkmovesInstance === undefined){
+      checkmovesInstance = new WorkerBuilder(checkmovesWorker)
+      checkmovesInstance.postMessage({test: 'yo', gamestring: game.fen()})
+    }
+
+    checkmovesInstance.onmessage = (message) => {
+      if(message)
+        setCounter(message.data)
+    }
+  }
+
+
+
+  function stopWorker(){
+    checkmovesInstance.terminate()
+    checkmovesInstance = undefined;
+  }
 
   function makeMove(move){
     //check if it is a valid move
@@ -103,6 +132,9 @@ function App() {
           <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => getNumericalValues(game)}>LOG</button>
           <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => makeMove('e4')}>MOVE white</button>
           <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => makeMove('Nc6')}>MOVE black</button>
+          <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => startWorker()}>Start Counter</button>
+          <button className='rounded-lg border border-white p-2 px-4 hover:bg-white hover:text-black' onClick={() => stopWorker()}>Stop Counter</button>
+          <h1>{counter}</h1>
         </div>
         <div className='w-1/2'>
           <Chessboard position={game.fen()} onPieceDrop={onDrop} />
