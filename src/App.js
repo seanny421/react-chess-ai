@@ -15,7 +15,6 @@ function App() {
     ['k', 12]//this might change we'll see
   ])
 
-
   function makeMove(move){
     //check if it is a valid move
     try{
@@ -54,9 +53,8 @@ function App() {
   }
 
   function makeMiniMaxMove(){
-    const bestMove = miniMaxRoot(3, game.fen(), true)
+    const bestMove = miniMaxRoot(4, game.fen(), false)
     makeMove(bestMove)
-    
   }
   
   function betterMove(){//looks 1 move ahead with minmax
