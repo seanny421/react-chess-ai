@@ -53,9 +53,8 @@ function App() {
   }
 
   function makeMiniMaxMove(){
-    const bestMove = miniMaxRoot(4, game.fen(), true)
+    const bestMove = miniMaxRoot(4, game.fen(), false)
     makeMove(bestMove)
-    
   }
   
   function betterMove(){//looks 1 move ahead with minmax
